@@ -1,0 +1,66 @@
+services:
+
+  # ---------------------------------------------------------
+  # PostgreSQL Database Service
+  # ---------------------------------------------------------
+  postgresql:
+    image: postgres:15
+    container_name: postgres-guac
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRESQL_DATABASE}  # Database name (from .env file)
+      POSTGRES_USER: ${POSTGRESQL_USERNAME}  # Database username
+      POSTGRES_PASSWORD: ${POSTGRESQL_PASSWORD}  # Database password
+    volumes:
+        # Mount startup script from guacamole container into postgres container to initialize DB schema
+        - "initdb:/docker-entrypoint-initdb.d:ro"
+        # Persist database data on host to survive container rebuilds
+        - "${HOME}/guacamole/postgres-data:/var/lib/postgresql/data"
+
+    networks:
+        - guac_network
+  
+  # ---------------------------------------------------------
+  # Guacamole Web Application
+  # ---------------------------------------------------------
+  guacamole:
+    image: guacamole/guacamole:1.6.0  # Guacamole web app image
+    container_name: guacamole
+    restart: unless-stopped
+    environment:
+      POSTGRESQL_DATABASE: ${POSTGRESQL_DATABASE}  # guacamole container also needs to be provided with DB name, user and password
+      POSTGRESQL_USERNAME: ${POSTGRESQL_USERNAME}
+      POSTGRESQL_PASSWORD: ${POSTGRESQL_PASSWORD}
+      POSTGRESQL_HOSTNAME: postgresql  # Must match service name above of postgres
+      POSTGRESQL_ENABLED: "true"  # Enable PostgreSQL authentication backend
+      GUACD_HOSTNAME: guacd  # Must match service name below of guacd
+    ports:
+        - 8080:8080
+    volumes:
+        # Mount startup script from guacamole container into postgres container to initialize DB schema
+        - "initdb:/opt/guacamole/extensions/guacamole-auth-jdbc/postgresql/schema:ro"
+    networks:
+        - guac_network
+
+  # ---------------------------------------------------------
+  # Guacamole Daemon (guacd)
+  # ---------------------------------------------------------
+  guacd:
+    image: guacamole/guacd:1.6.0  # Guacd daemon handles RDP, SSH, VNC protocols
+    container_name: guacd
+    restart: unless-stopped
+    networks:
+      - guac_network
+
+
+# ---------------------------------------------------------
+# Named Volume
+# ---------------------------------------------------------
+volumes:
+    initdb:
+
+# ---------------------------------------------------------
+# Shared Network
+# ---------------------------------------------------------
+networks:
+  guac_network:
