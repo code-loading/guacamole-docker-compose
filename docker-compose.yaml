@@ -14,8 +14,8 @@ services:
     volumes:
         # Mount startup script from guacamole container into postgres container to initialize DB schema
         - "initdb:/docker-entrypoint-initdb.d:ro"
-        # Persist database data on host to survive container rebuilds
-        - "${HOME}/guacamole/postgres-data:/var/lib/postgresql/data"
+        # (optional) Persist database data on host to survive container rebuilds:
+       # - "${HOME}/guacamole/postgres-data:/var/lib/postgresql/data"
 
     networks:
         - guac_network
