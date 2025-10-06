@@ -39,6 +39,12 @@ http://localhost:8080/guacamole
 ```
 Don't forget to add /guacamole
 
+4. Login via default username and password
+```bash
+guacadmin
+```
+(It's best to change this ASAP!)
+
 ## Volumes / Mounting Points
 `initdb`: Initialization scripts for PostgreSQL and Guacamole
 
