@@ -48,7 +48,7 @@ guacadmin
 ## Volumes / Mounting Points
 `initdb`: Initialization scripts for PostgreSQL and Guacamole
 
-`${HOME}/guacamole/postgres-data`: Persistent PostgreSQL database data
+(Optional. Currently commented out) `${HOME}/guacamole/postgres-data`: Persistent PostgreSQL database data
 
 ## Notes / Recommendations
 You can change the host port `8080` if it conflicts with other services
